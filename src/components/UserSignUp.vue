@@ -1,0 +1,144 @@
+<template>
+  <div class="signup-container">
+    <h1 class="signup-title">Sign Up</h1>
+    <form @submit.prevent="handleSignUp" class="signup-form">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          v-model="username"
+          required
+          placeholder="Enter your username"
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" v-model="email" required placeholder="Enter your email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          v-model="password"
+          required
+          placeholder="Enter your password"
+        />
+      </div>
+      <div class="form-group">
+        <label for="confirm-password">Confirm Password:</label>
+        <input
+          type="password"
+          id="confirm-password"
+          v-model="confirmPassword"
+          required
+          placeholder="Confirm your password"
+        />
+      </div>
+      <button type="submit" class="signup-button">Sign Up</button>
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import axios from 'axios'
+
+const username = ref('')
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const errorMessage = ref('')
+
+const handleSignUp = async () => {
+  if (password.value !== confirmPassword.value) {
+    errorMessage.value = 'Passwords do not match.'
+    return
+  }
+
+  try {
+    const response = await axios.post('https://ai-blue-tutor-backend.vercel.app/signup', {
+      username: username.value,
+      email: email.value,
+      password: password.value
+    })
+
+    // Handle successful signup
+    console.log('Sign up successful:', response.data)
+    // Redirect or show a success message, etc.
+
+    // Reset error message
+    errorMessage.value = ''
+  } catch (error) {
+    console.error('Sign up failed:', error)
+    errorMessage.value = 'Sign up failed. Please try again.'
+  }
+}
+</script>
+
+<style scoped>
+.signup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.signup-title {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+}
+
+.signup-form {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 300px;
+  max-width: 100%;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.signup-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.signup-button:hover {
+  background-color: #0056b3;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+</style>
+
