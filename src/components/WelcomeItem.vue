@@ -4,6 +4,8 @@
       <slot name="icon"></slot>
     </i>
     <div class="details">
+      <div class="heading"><h1>Welcome to Blue Tutor</h1></div>
+
       <h3>
         <slot name="heading"></slot>
       </h3>
@@ -40,23 +42,21 @@ h3 {
   margin-bottom: 0.4rem;
   color: var(--color-heading);
 }
-
+.heading {
+  text-align: center;
+  padding: 1rem 0 1rem;
+  border: 1rem;
+  border-color: 2px solid black;
+  border-radius: 5%;
+  color: rgb(53, 167, 233);
+}
 @media (min-width: 1024px) {
   .item {
     margin-top: 0;
     padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
   }
 
-  i {
-    top: calc(50% - 25px);
-    left: -26px;
-    position: absolute;
-    border: 1px solid var(--color-border);
-    background: var(--color-background);
-    border-radius: 8px;
-    width: 50px;
-    height: 50px;
-  }
+  
 
   .item:before {
     content: ' ';

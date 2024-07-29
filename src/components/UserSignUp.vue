@@ -50,30 +50,30 @@ const username = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const message = ref('')
 const errorMessage = ref('')
 
 const handleSignUp = async () => {
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Passwords do not match.'
+    message.value = 'Passwords do not match.'
     return
   }
-
   try {
-    const response = await axios.post('https://ai-blue-tutor-backend.vercel.app/signup', {
+    const response = await axios.post('http://localhost:5000/signup', {
       username: username.value,
       email: email.value,
       password: password.value
     })
 
-    // Handle successful signup
-    console.log('Sign up successful:', response.data)
-    // Redirect or show a success message, etc.
-
+    
+    
+    let data = response.data["message"]
     // Reset error message
-    errorMessage.value = ''
+    message.value = data 
   } catch (error) {
+    
     console.error('Sign up failed:', error)
-    errorMessage.value = 'Sign up failed. Please try again.'
+    errorMessage.value = 'Sign up failed, change username or email'
   }
 }
 </script>
@@ -86,6 +86,7 @@ const handleSignUp = async () => {
   justify-content: center;
   height: 100vh;
   background-color: #f5f5f5;
+  width: 100%;
 }
 
 .signup-title {

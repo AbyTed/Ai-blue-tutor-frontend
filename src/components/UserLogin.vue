@@ -2,6 +2,7 @@
   <div class="login-container">
     <h1 class="login-title">Login</h1>
     <form @submit.prevent="handleLogin" class="login-form">
+      <div v-if="message" class="success-message">{{ message }}</div>
       <div class="form-group">
         <label for="username">Username:</label>
         <input
@@ -34,21 +35,19 @@ import axios from 'axios'
 
 const username = ref('')
 const password = ref('')
+const message = ref('')
 const errorMessage = ref('')
 
 const handleLogin = async () => {
   try {
-    const response = await axios.post('https://https://ai-blue-tutor-backend.vercel.app/login', {
+    const response = await axios.post('http://localhost:5000/login', {
       username: username.value,
       password: password.value
     })
 
-    // Handle successful login
-    console.log('Login successful:', response.data)
-    // Redirect or store authentication token, etc.
-
+    let data = response.data["message"]
     // Reset error message
-    errorMessage.value = ''
+    message.value = data
   } catch (error) {
     console.error('Login failed:', error)
     errorMessage.value = 'Invalid username or password.'
@@ -62,7 +61,7 @@ const handleLogin = async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 70vh;
   background-color: #f5f5f5;
 }
 
@@ -117,5 +116,10 @@ const handleLogin = async () => {
   margin-top: 10px;
   color: #dc3545;
   font-size: 0.875rem;
+}
+.success-message {
+  margin-top: 10px;
+  color: green;
+  font-size: rem;
 }
 </style>
