@@ -59,7 +59,8 @@ const handleSignUp = async () => {
     return
   }
   try {
-    const response = await axios.post('https://ai-blue-tutor-backend.vercel.app/signup', {
+    axios.defaults.withCredentials = true
+    const response = await axios.post('https://bluetutor-backend.vercel.app/signup', {
       username: username.value,
       email: email.value,
       password: password.value
