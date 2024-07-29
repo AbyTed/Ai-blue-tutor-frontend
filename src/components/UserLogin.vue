@@ -40,7 +40,7 @@ const errorMessage = ref('')
 
 const handleLogin = async () => {
   try {
-    const response = await axios.post('http://localhost:5000/login', {
+    const response = await axios.post('https://ai-blue-tutor-backend.vercel.app/login', {
       username: username.value,
       password: password.value
     })
