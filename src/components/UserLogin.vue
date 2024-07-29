@@ -23,7 +23,9 @@
           placeholder="Enter your password"
         />
       </div>
-      <button type="submit" class="login-button">Login</button>
+      <button type="submit" class="login-button" :disabled="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     </form>
   </div>
@@ -32,28 +34,41 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 const username = ref('')
 const password = ref('')
 const message = ref('')
 const errorMessage = ref('')
+const isLoading = ref(false)
+
+const router = useRouter()
 
 const handleLogin = async () => {
+  isLoading.value = true
   try {
-    const response = await axios.post('https://bluetutor-backend.vercel.app/login', {
+    const response = await axios.post('http://localhost:5000/login', {
       username: username.value,
       password: password.value
     })
 
     let data = response.data["message"]
-    // Reset error message
+    errorMessage.value = ''
     message.value = data
+
+    router.push('/image-text-extractor')
   } catch (error) {
     console.error('Login failed:', error)
+    message.value = ''
     errorMessage.value = 'Invalid username or password.'
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
+
+
+
 
 <style scoped>
 .login-container {

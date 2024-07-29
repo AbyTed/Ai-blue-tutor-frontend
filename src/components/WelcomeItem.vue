@@ -4,12 +4,17 @@
       <slot name="icon"></slot>
     </i>
     <div class="details">
-      <div class="heading"><h1>Welcome to Blue Tutor</h1></div>
-
+      <div class="heading">
+        <h1>Welcome to Blue Tutor</h1>
+      </div>
       <h3>
-        <slot name="heading"></slot>
+        <slot name="heading">Empower Your Learning Journey</slot>
       </h3>
-      <slot></slot>
+      <p>
+        <slot>
+          Discover a new way to enhance your skills with our interactive tutorials, expert guidance, and personalized learning experience. Join us today and unlock your potential!
+        </slot>
+      </p>
     </div>
   </div>
 </template>
@@ -19,6 +24,10 @@
   margin-top: 2rem;
   display: flex;
   position: relative;
+  background-color: #f9f9f9; /* Light gray background */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 1rem;
 }
 
 .details {
@@ -28,50 +37,59 @@
 
 i {
   display: flex;
-  place-items: center;
-  place-content: center;
-  width: 32px;
-  height: 32px;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  font-size: 2rem;
+  color: #2196F3; /* Blue color for icon */
+}
 
-  color: var(--color-text);
+.heading {
+  text-align: center;
+  padding: 1rem;
+  border: 2px solid #2196F3; /* Blue border */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #e3f2fd; /* Light blue background */
+  color: #2196F3; /* Blue text color */
+  margin-bottom: 1rem;
 }
 
 h3 {
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin-bottom: 0.4rem;
-  color: var(--color-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333; /* Dark gray color */
 }
-.heading {
-  text-align: center;
-  padding: 1rem 0 1rem;
-  border: 1rem;
-  border-color: 2px solid black;
-  border-radius: 5%;
-  color: rgb(53, 167, 233);
+
+p {
+  font-size: 1rem;
+  color: #666; /* Gray text color */
+  line-height: 1.6;
 }
+
 @media (min-width: 1024px) {
   .item {
     margin-top: 0;
-    padding: 0.4rem 0 1rem calc(var(--section-gap) / 2);
+    padding: 1rem;
+    /* Adjust padding if needed */
   }
 
-  
-
-  .item:before {
+  .item:before,
+  .item:after {
     content: ' ';
-    border-left: 1px solid var(--color-border);
+    border-left: 1px solid #ddd; /* Light gray border */
     position: absolute;
     left: 0;
+    width: 1px;
+  }
+
+  .item:before {
     bottom: calc(50% + 25px);
     height: calc(50% - 25px);
   }
 
   .item:after {
-    content: ' ';
-    border-left: 1px solid var(--color-border);
-    position: absolute;
-    left: 0;
     top: calc(50% + 25px);
     height: calc(50% - 25px);
   }
@@ -83,5 +101,11 @@ h3 {
   .item:last-of-type:after {
     display: none;
   }
+}
+@media (min-width:1024px){
+  .item{
+    width: 50rem;
+  }
+  
 }
 </style>
