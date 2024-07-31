@@ -1,9 +1,21 @@
 <template>
   <div class="ocr-container">
-    <h2>Image Text Extractor</h2>
-    <input type="file" @change="onFileChange" accept="image/*" />
-
-    <p v-if="text">{{ text }}</p>
+    <h2 class="title">Image Text Extractor</h2>
+    <p class="instructions">Upload a picture, and we'll help you read the text!</p>
+    <input @change="onFileChange" type="file" accept="image/*" class="file-input" />
+    <textarea
+      v-model="studentQuestion"
+      placeholder="Type your question here..."
+      class="question-input"
+    ></textarea>
+    <div class="question-container">
+      <button class="submit-button" @click="sendData">Submit</button>
+    </div>
+    <img id="uploaded-image" class="uploaded-image" width="50%" />
+    <div v-if="isLoading" class="loading-sign">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
     <p class="help" v-if="responseMessage">
       {{ responseMessage }}
     </p>
@@ -16,16 +28,26 @@ import Tesseract from 'tesseract.js'
 import axios from 'axios'
 
 const grayscaleImage = ref(null)
-const text = ref('')
+const text = ref(null)
 const responseMessage = ref('')
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const studentQuestion = ref('')
 
 const onFileChange = async (event) => {
+  text.value = null
   const file = event.target.files[0]
   if (file) {
     const reader = new FileReader()
     reader.onload = async (e) => {
       const dataUrl = e.target.result
+
+      // Display the image
+      const imgElement = document.getElementById('uploaded-image')
+      if (imgElement) {
+        imgElement.src = dataUrl
+      } else {
+        console.error('Image element not found.')
+      }
+
       const img = new Image()
       img.src = dataUrl
       img.onload = async () => {
@@ -64,8 +86,9 @@ const onFileChange = async (event) => {
           const result = await Tesseract.recognize(grayscaleImage.value, 'eng', {
             logger: (info) => console.log(info) // Optional: Log progress
           })
-          text.value = result.data.text
-          
+          text.value =
+            result.data.text + 'everything beyond this is to clairify:' + studentQuestion.value
+          await sendData()
         } catch (error) {
           console.error('OCR failed:', error)
           text.value = 'Failed to extract text.'
@@ -76,9 +99,14 @@ const onFileChange = async (event) => {
   }
 }
 
-
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const sendData = async () => {
+  
+  await delay(5000);
+
   console.log('Sending data:', text.value) // Log the data being sent
   try {
     const response = await axios.post(`http://localhost:5000/tutor/text`, {
@@ -86,7 +114,7 @@ const sendData = async () => {
     })
 
     console.log('Response received:', response.data) // Log the response data
-    responseMessage.value = response.data.message // Adjust according to your response structure
+    responseMessage.value = response.data['message'] // Adjust according to your response structure
   } catch (error) {
     console.error('Error sending data:', error)
     responseMessage.value = 'Failed to send data.'
@@ -95,35 +123,128 @@ const sendData = async () => {
 </script>
 
 <style scoped>
-
-.container {
-  color: black;
-  border: 5px solid lightblue;
-  border-radius: 5px;
-  background-color: lightgreen;
-  padding: 5px;
-}
-.ocr-container {
+.question-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background: #f9f9f9;
+  max-width: 600px;
+  margin: auto;
 }
 
-input[type='file'] {
-  margin-bottom: 1rem;
+.title {
+  font-size: 2rem;
+  color: #4a90e2;
+  margin-bottom: 10px;
 }
 
-button {
-  margin-bottom: 1rem;
+.question-input {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  border: 2px solid #4a90e2;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  resize: vertical;
 }
 
-h2 {
-  margin-bottom: 1rem;
+.submit-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background: #4a90e2;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-h3 {
-  margin-top: 1rem;
+.submit-button:hover {
+  background: #357abd;
+}
+
+.response-message {
+  font-size: 1rem;
+  color: #d9534f;
+  margin-top: 20px;
+  text-align: center;
+}
+.title {
+  font-size: 2rem;
+  color: #4a90e2;
+  margin-bottom: 10px;
+}
+
+.instructions {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.file-input {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 2px solid #4a90e2;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #eaf4fc;
+}
+
+.uploaded-image {
+  max-width: 80%;
+  height: auto;
+  border: 2px solid #4a90e2;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.help {
+  font-size: 1rem;
+  color: #d9534f;
+  margin-top: 20px;
+  text-align: center;
+}
+.ocr-container {
+  text-align: center;
+}
+
+.loading-sign {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Make sure it's on top */
+}
+
+.spinner {
+  border: 8px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
 
