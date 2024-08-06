@@ -52,7 +52,10 @@ const onFileChange = async (file) => {
       const dataUrl = e.target.result
 
       // Display the image
-
+      const originalImg = document.getElementById('uploaded-image')
+      if (originalImg) {
+        originalImg.src = dataUrl
+      }
       const img = new Image()
       img.src = dataUrl
 
@@ -107,60 +110,59 @@ const onFileChange = async (file) => {
 const handleRecording = async () => {
   if (isRecognizing.value) {
     // Stop recording
-    audio_present.value = true;
+    audio_present.value = true
     if (mediaRecorder) {
-      mediaRecorder.stop();
-      isRecognizing.value = false;
-      console.log('Recording stopped.');
+      mediaRecorder.stop()
+      isRecognizing.value = false
+      console.log('Recording stopped.')
     }
   } else {
     // Start recording
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = []; // Reset audio chunks
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        mediaRecorder = new MediaRecorder(stream)
+        audioChunks = [] // Reset audio chunks
 
         mediaRecorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
-            audioChunks.push(event.data);
-            console.log('Audio chunk available:', event.data.size);
+            audioChunks.push(event.data)
+            console.log('Audio chunk available:', event.data.size)
           }
-        };
+        }
 
         mediaRecorder.onstop = async () => {
-          console.log('Recording stopped.');
+          console.log('Recording stopped.')
           if (audioChunks.length > 0) {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            console.log('Audio Blob URL:', audioUrl);
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
+            const audioUrl = URL.createObjectURL(audioBlob)
+            console.log('Audio Blob URL:', audioUrl)
 
             // Optional: Verify the audio data size
-            console.log('Audio Blob size:', audioBlob.size);
+            console.log('Audio Blob size:', audioBlob.size)
 
             // Optionally, create a File from Blob and append it to FormData
-            const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
-            console.log('Audio File:', audioFile);
+            const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' })
+            console.log('Audio File:', audioFile)
 
             // Optionally, perform further actions with the File
           } else {
-            console.warn('No audio chunks available.');
+            console.warn('No audio chunks available.')
           }
-        };
+        }
 
-        mediaRecorder.start();
-        isRecognizing.value = true;
-        console.log('Recording started.');
+        mediaRecorder.start()
+        isRecognizing.value = true
+        console.log('Recording started.')
       } catch (error) {
-        console.error('Error accessing media devices:', error);
-        isRecognizing.value = false;
+        console.error('Error accessing media devices:', error)
+        isRecognizing.value = false
       }
     } else {
-      alert('Media Devices not supported');
+      alert('Media Devices not supported')
     }
   }
-};
-
+}
 
 // Attach handleRecording to a single button's click event
 const handleSubmit = async (event) => {
