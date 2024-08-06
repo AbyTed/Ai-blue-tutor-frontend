@@ -53,6 +53,7 @@ const confirmPassword = ref('')
 const message = ref('')
 const errorMessage = ref('')
 
+
 const handleSignUp = async () => {
   if (password.value !== confirmPassword.value) {
     message.value = 'Passwords do not match.'

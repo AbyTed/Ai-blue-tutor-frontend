@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import UserLogin from '../components/UserLogin.vue'
 import UserSignUp from '../components/UserSignUp.vue'
 import WelcomeItem from '../components/WelcomeItem.vue'
-import ImageTextExtractor from '@/components/ImageTextExtractor.vue'
+import BlueTutor from '@/components/blueTutor.vue'
 const routes = [
   {
     path: '/',
@@ -22,9 +22,9 @@ const routes = [
   },
 
   {
-    path: '/image-text-extractor',
-    name: 'ImageTextExtractor',
-    component: ImageTextExtractor
+    path: '/login/blueTutor',
+    name: 'blueTutor',
+    component: BlueTutor
   }
 ]
 

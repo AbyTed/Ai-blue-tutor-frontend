@@ -1,3 +1,4 @@
+
 <template>
   <div class="login-container">
     <h1 class="login-title">Login</h1>
@@ -51,12 +52,13 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value
     })
-
-    let data = response.data["message"]
+    
+    let data = response.data['message']
     errorMessage.value = ''
     message.value = data
-
-    router.push('/image-text-extractor')
+    
+    router.push('/login/blueTutor')
+    
   } catch (error) {
     console.error('Login failed:', error)
     message.value = ''
