@@ -52,6 +52,7 @@ const onFileChange = async (file) => {
       const dataUrl = e.target.result
 
       // Display the image
+      console.log(dataUrl)
       const originalImg = document.getElementById('uploaded-image')
       if (originalImg) {
         originalImg.src = dataUrl
@@ -116,51 +117,49 @@ const handleRecording = async () => {
       isRecognizing.value = false
       console.log('Recording stopped.')
     }
-  } else {
-    // Start recording
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        mediaRecorder = new MediaRecorder(stream)
-        audioChunks = [] // Reset audio chunks
+  }
+  // Start recording
+  else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      mediaRecorder = new MediaRecorder(stream)
+      audioChunks = [] // Reset audio chunks
 
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            audioChunks.push(event.data)
-            console.log('Audio chunk available:', event.data.size)
-          }
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunks.push(event.data)
+          console.log('Audio chunk available:', event.data.size)
         }
-
-        mediaRecorder.onstop = async () => {
-          console.log('Recording stopped.')
-          if (audioChunks.length > 0) {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
-            const audioUrl = URL.createObjectURL(audioBlob)
-            console.log('Audio Blob URL:', audioUrl)
-
-            // Optional: Verify the audio data size
-            console.log('Audio Blob size:', audioBlob.size)
-
-            // Optionally, create a File from Blob and append it to FormData
-            const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' })
-            console.log('Audio File:', audioFile)
-
-            // Optionally, perform further actions with the File
-          } else {
-            console.warn('No audio chunks available.')
-          }
-        }
-
-        mediaRecorder.start()
-        isRecognizing.value = true
-        console.log('Recording started.')
-      } catch (error) {
-        console.error('Error accessing media devices:', error)
-        isRecognizing.value = false
       }
-    } else {
-      alert('Media Devices not supported')
+
+      mediaRecorder.onstop = async () => {
+        console.log('Recording stopped.')
+        if (audioChunks.length > 0) {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
+          const audioUrl = URL.createObjectURL(audioBlob)
+          console.log('Audio Blob URL:', audioUrl)
+
+          // Optional: Verify the audio data size
+          console.log('Audio Blob size:', audioBlob.size)
+
+          // Optionally, create a File from Blob and append it to FormData
+          const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' })
+          console.log('Audio File:', audioFile)
+
+          // Optionally, perform further actions with the File
+        } else {
+          console.warn('No audio chunks available.')
+        }
+      }
+
+      mediaRecorder.start()
+      isRecognizing.value = true
+    } catch (error) {
+      console.error('Error accessing media devices:', error)
+      isRecognizing.value = false
     }
+  } else {
+    alert('Media Devices not supported')
   }
 }
 
@@ -186,7 +185,6 @@ const handleSubmit = async (event) => {
       formData.append('audio', audioFile)
     }
   }
-  console.log(formData)
   try {
     const response = await axios.post('https://bluetutor-backend.vercel.app/tutor/text', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -321,14 +319,7 @@ const handleSubmit = async (event) => {
   z-index: 1000; /* Make sure it's on top */
 }
 
-.spinner {
-  border: 8px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top: 8px solid #3498db;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
+
 
 @keyframes spin {
   0% {
