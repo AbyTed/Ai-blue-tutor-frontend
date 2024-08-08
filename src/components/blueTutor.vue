@@ -228,16 +228,16 @@ const handleSubmit = async (event) => {
       const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' })
       formData.append('audio', audioFile)
     }
-  } //https://bluetutor.vercel.app, http://locolhost:5000
+  } //https://bluetutor.vercel.app, http://localhost:5000
   try {
-    const response = await axios.post('https://bluetutor.vercel.app/tutor/text', formData, {
+    const response = await axios.post('https//bluetutor-backend.vercel.app/tutor/text', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
 
     setMessage(response.data.message, '.info')
   } catch (error) {
     console.error('Error sending data:', error)
-    setMessage('Failed to send data', '.error')
+    setMessage('Failed to send data', 'error')
   } finally {
     isLoading.value = false
   }
