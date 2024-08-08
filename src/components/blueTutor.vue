@@ -2,7 +2,7 @@
 <template>
   <div class="ocr-container">
     <form @submit.prevent="handleSubmit">
-      <h2 class="title">Ai Tutor</h2>
+      <h2 class="title">Ai English Tutor</h2>
       <p class="instructions">Upload a picture, and we'll help you read the assignment!</p>
       <input required type="file" @change="onFileChange" accept="image/*" class="file-input" />
       <textarea
@@ -22,13 +22,13 @@
       <div class="spinner"></div>
       <p>Processing...</p>
     </div>
-    <p class="help" v-if="responseMessage">
+    <p class="help" :class="messageType" v-if="responseMessage">
       {{ responseMessage }}
     </p>
   </div>
 </template>
 
-<script setup>
+<script setup >
 import { ref } from 'vue'
 import Tesseract from 'tesseract.js'
 import axios from 'axios'
@@ -40,71 +40,93 @@ const isRecognizing = ref(false)
 const isLoading = ref(false)
 const text = ref('')
 const audio_present = ref(false)
-
+const messageType = ref('')
 let mediaRecorder = null
 let audioChunks = []
 
-const onFileChange = async (file) => {
+const processImage = async (dataUrl) => {
+  const img = new Image()
+  img.src = dataUrl
+
+  return new Promise((resolve) => {
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx.drawImage(img, 0, 0)
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const data = imageData.data
+
+      // Convert to grayscale
+      for (let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+        data[i] = avg // Red
+        data[i + 1] = avg // Green
+        data[i + 2] = avg // Blue
+      }
+
+      // Apply thresholding
+      const threshold = 128
+      for (let i = 0; i < data.length; i += 4) {
+        const avg = data[i] // Since it's grayscale, R=G=B
+        const binary = avg > threshold ? 255 : 0
+        data[i] = binary // Red
+        data[i + 1] = binary // Green
+        data[i + 2] = binary // Blue
+      }
+
+      ctx.putImageData(imageData, 0, 0)
+      const grayscaleDataUrl = canvas.toDataURL('image/png')
+      resolve(grayscaleDataUrl)
+    }
+  })
+}
+
+const performOCR = async (imageUrl) => {
+  try {
+    const result = await Tesseract.recognize(imageUrl, 'eng', {
+      logger: (info) => console.log(info) // Optional: Log progress
+    })
+    return result.data.text
+  } catch (error) {
+    console.error('OCR failed:', error)
+    throw new Error('Failed to extract text.')
+  }
+}
+
+const onFileChange = async (event) => {
+  const file = event.target.files[0]
+  text.value = null
+
   if (file) {
     const reader = new FileReader()
 
     reader.onload = async (e) => {
       const dataUrl = e.target.result
+      console.log(dataUrl)
 
       // Display the image
-      console.log(dataUrl)
       const originalImg = document.getElementById('uploaded-image')
       if (originalImg) {
         originalImg.src = dataUrl
       }
-      const img = new Image()
-      img.src = dataUrl
 
-      img.onload = async () => {
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        canvas.width = img.width
-        canvas.height = img.height
-        ctx.drawImage(img, 0, 0)
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        const data = imageData.data
+      try {
+        const grayscaleDataUrl = await processImage(dataUrl)
+        grayscaleImage.value = grayscaleDataUrl
 
-        // Convert to grayscale
-        for (let i = 0; i < data.length; i += 4) {
-          const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
-          data[i] = avg // Red
-          data[i + 1] = avg // Green
-          data[i + 2] = avg // Blue
-        }
-        ctx.putImageData(imageData, 0, 0)
-
-        // Apply thresholding
-        const threshold = 128
-        for (let i = 0; i < data.length; i += 4) {
-          const avg = data[i] // Since it's grayscale, R=G=B
-          const binary = avg > threshold ? 255 : 0
-          data[i] = binary // Red
-          data[i + 1] = binary // Green
-          data[i + 2] = binary // Blue
-        }
-        ctx.putImageData(imageData, 0, 0)
-
-        grayscaleImage.value = canvas.toDataURL('image/png')
-
-        // Perform OCR
-        try {
-          const result = await Tesseract.recognize(grayscaleImage.value, 'eng', {
-            logger: (info) => console.log(info) // Optional: Log progress
-          })
-          text.value = result.data.text
-        } catch (error) {
-          console.error('OCR failed:', error)
-          text.value = 'Failed to extract text.'
-        }
+        const extractedText = await performOCR(grayscaleDataUrl)
+        text.value = extractedText
+      } catch (error) {
+        console.error(error.message)
       }
     }
 
     reader.readAsDataURL(file)
+  } else {
+    console.error('No file selected.')
   }
 }
 
@@ -162,7 +184,28 @@ const handleRecording = async () => {
     alert('Media Devices not supported')
   }
 }
+const waitForVariable = (getVariable, targetValue, interval = 100, timeout = 100000) => {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now()
 
+    const check = () => {
+      const value = getVariable()
+      if (value != targetValue) {
+        resolve()
+      } else if (Date.now() - startTime > timeout) {
+        reject(new Error('Timeout: Variable did not reach target value.'))
+      } else {
+        setTimeout(check, interval)
+      }
+    }
+
+    check()
+  })
+}
+const setMessage = (message, type) => {
+  responseMessage.value = message
+  messageType.value = type
+}
 // Attach handleRecording to a single button's click event
 const handleSubmit = async (event) => {
   event.preventDefault()
@@ -171,8 +214,9 @@ const handleSubmit = async (event) => {
   const formData = new FormData()
 
   // Append image if available
+  await waitForVariable(() => text.value, null)
 
-  formData.append('text', text)
+  formData.append('text', text.value)
 
   // Append text
   formData.append('studentQuestion', studentQuestion.value)
@@ -184,15 +228,16 @@ const handleSubmit = async (event) => {
       const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' })
       formData.append('audio', audioFile)
     }
-  }
+  } //https://bluetutor.vercel.app, http://locolhost:5000
   try {
-    const response = await axios.post('https://bluetutor-backend.vercel.app/tutor/text', formData, {
+    const response = await axios.post('https://bluetutor.vercel.app/tutor/text', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    responseMessage.value = response.data.message
+
+    setMessage(response.data.message, '.info')
   } catch (error) {
     console.error('Error sending data:', error)
-    responseMessage.value = 'Failed to send data.'
+    setMessage('Failed to send data', '.error')
   } finally {
     isLoading.value = false
   }
@@ -210,6 +255,31 @@ const handleSubmit = async (event) => {
   background: #f9f9f9;
   max-width: 600px;
   margin: auto;
+}
+.help {
+  font-size: 1rem;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.success {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.info {
+  color: #004085;
+  background-color: #cce5ff;
+  border: 1px solid #b8daff;
 }
 
 .title {
@@ -294,12 +364,7 @@ const handleSubmit = async (event) => {
   background: #eaf4fc;
 }
 
-.help {
-  font-size: 1rem;
-  color: #d9534f;
-  margin-top: 20px;
-  text-align: center;
-}
+
 .ocr-container {
   text-align: center;
 }
@@ -318,8 +383,6 @@ const handleSubmit = async (event) => {
   justify-content: center;
   z-index: 1000; /* Make sure it's on top */
 }
-
-
 
 @keyframes spin {
   0% {
