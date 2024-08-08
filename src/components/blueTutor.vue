@@ -230,7 +230,7 @@ const handleSubmit = async (event) => {
     }
   } //https://bluetutor.vercel.app, http://localhost:5000
   try {
-    const response = await axios.post('https//bluetutor-backend.vercel.app/tutor/text', formData, {
+    const response = await axios.post('https://bluetutor-backend.vercel.app/tutor/text', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
 
