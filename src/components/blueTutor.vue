@@ -265,7 +265,7 @@ const handleSubmit = async (event) => {
   }
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_SERVER_LOCAL}/tutor/text`,
+      `${import.meta.env.VITE_BACKEND_SERVER_PRODUCTION}/tutor/text`,
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' }
