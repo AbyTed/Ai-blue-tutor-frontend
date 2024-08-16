@@ -3,7 +3,7 @@
   <div class="ocr-container">
     <form @submit.prevent="handleSubmit">
       <h2 class="title">Ai English Tutor</h2>
-      <p class="instructions">Upload a picture, and we'll help you read the assignment!</p>
+      <p class="instructions">Upload a picture, and we'll help you on your assignment!</p>
       <input required type="file" @change="onFileChange" accept="image/*" class="file-input" />
       <textarea
         v-model="studentQuestion"
@@ -17,14 +17,24 @@
         <input type="submit" class="submit-button" value="Submit" />
       </div>
     </form>
-    <img id="uploaded-image" class="uploaded-image" alt="assignment" width="50%" />
+    <img
+      id="uploaded-image"
+      class="uploaded-image"
+      alt="your assignment displayed here"
+      width="50%"
+    />
+
     <div v-if="isLoading" class="loading-sign">
       <div class="spinner"></div>
       <p>Processing...</p>
     </div>
+
     <p class="help" :class="messageType" v-if="responseMessage">
       {{ responseMessage }}
     </p>
+    <div class="audio-player">
+      <audio v-if="audioUrl" controls :src="audioUrl"></audio>
+    </div>
   </div>
 </template>
 
@@ -33,6 +43,7 @@ import { ref } from 'vue'
 import Tesseract from 'tesseract.js'
 import axios from 'axios'
 
+const audioUrl = ref('')
 const grayscaleImage = ref(null)
 const responseMessage = ref('')
 const studentQuestion = ref('')
@@ -129,6 +140,28 @@ const onFileChange = async (event) => {
     console.error('No file selected.')
   }
 }
+const sendAudioRequest = async (text_value) => {
+  try {
+    // Send the request to the backend
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_SERVER_LOCAL}/tutor/audio`,
+      { text: text_value },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        responseType: 'blob' // Important for receiving binary data
+      }
+    )
+
+    // Create a URL for the received audio blob
+    const audio_url = URL.createObjectURL(response.data)
+    audioUrl.value = audio_url // Update your audioUrl reactive variable
+  } catch (error) {
+    console.error('Error sending data:', error)
+    setMessage('Failed to send data', 'error')
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const handleRecording = async () => {
   if (isRecognizing.value) {
@@ -206,6 +239,7 @@ const setMessage = (message, type) => {
   responseMessage.value = message
   messageType.value = type
 }
+
 // Attach handleRecording to a single button's click event
 const handleSubmit = async (event) => {
   event.preventDefault()
@@ -228,13 +262,18 @@ const handleSubmit = async (event) => {
       const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' })
       formData.append('audio', audioFile)
     }
-  } //https://bluetutor.vercel.app, http://localhost:5000
+  }
   try {
-    const response = await axios.post('https://bluetutor-backend.vercel.app/tutor/text', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_SERVER_LOCAL}/tutor/text`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+    )
 
-    setMessage(response.data.message, '.info')
+    await sendAudioRequest(response.data.message)
+    setMessage(response.data.message, 'info')
   } catch (error) {
     console.error('Error sending data:', error)
     setMessage('Failed to send data', 'error')
@@ -245,6 +284,39 @@ const handleSubmit = async (event) => {
 </script>
 
 <style scoped>
+.audio-player {
+  text-align: center;
+  margin-top: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+audio {
+  margin-top: 20px;
+}
+
+.audio-source {
+  margin-top: 1rem; /* Spacing above the audio component */
+  text-align: center; /* Center the audio controls */
+}
 .question-container {
   display: flex;
   flex-direction: column;
@@ -364,9 +436,11 @@ const handleSubmit = async (event) => {
   background: #eaf4fc;
 }
 
-
 .ocr-container {
   text-align: center;
+  height: 95vh;
+  padding: 50px;
+  align-content: center;
 }
 
 .loading-sign {

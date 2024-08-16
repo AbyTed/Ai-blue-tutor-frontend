@@ -1,11 +1,12 @@
-<script setup>
-</script>
+
 <template>
-  <div id="app">
-    <header></header>
-    <main>
-      <router-view></router-view>
-    </main>
+  <div>
+    <div id="app">
+      <header></header>
+      <main>
+        <router-view></router-view>
+      </main>
+    </div>
     <nav aria-label="Main Navigation">
       <router-link to="/" class="nav-button">Home</router-link>
       <router-link to="/login" class="nav-button">Login</router-link>
@@ -24,6 +25,7 @@
 
 main {
   flex: 1;
+  
   /* Main content styling */
 }
 

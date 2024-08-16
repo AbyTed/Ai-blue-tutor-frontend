@@ -12,22 +12,39 @@
       </h3>
       <p>
         <slot>
-          Discover a new way to enhance your skills with our interactive tutorials, expert guidance, and personalized learning experience. Join us today and unlock your potential!
+          Introducing Blue Tutor!
+
+          Blue Tutor is an easy-to-use AI tool designed especially for young students. With just a click, kids can take a picture of their assignment or any educational material, and Blue Tutor will instantly provide a helpful response. For added convenience, it also offers audio feedback.
+
+          Perfect for grades 3-8, Blue Tutor makes learning straightforward and fun without any complicated setups. It’s your child’s friendly assistant for quick, reliable help anytime!
+          <br /><br />
+          Why Choose Blue Tutor?
+          <ul>
+            <li><strong>Instant Assistance:</strong> Simply click and take a picture to get a helpful response and audio feedback instantly.</li>
+            <li><strong>Easy to Use:</strong> Designed for young students, making learning simple and fun without complicated processes.</li>
+            <li><strong>Supports English Learning:</strong> Ideal for students in grades 3-8 to enhance their learning experience effortlessly.</li>
+          </ul>
+          <br />
+          Start your child’s learning adventure today with Blue Tutor and see how easy and enjoyable learning can be!
         </slot>
       </p>
     </div>
   </div>
 </template>
 
+
+
 <style scoped>
 .item {
-  margin-top: 2rem;
   display: flex;
-  position: relative;
+  align-items: flex-start; /* Align items to the top */
   background-color: #f9f9f9; /* Light gray background */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  padding: 1rem;
+  padding: 2rem; /* Increased padding for better spacing */
+  position: relative;
+  max-width: 800px; /* Limiting maximum width */
+  margin: 2rem auto 2rem; /* Centering and margin for the component */
 }
 
 .details {
@@ -39,9 +56,9 @@ i {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  font-size: 2.5rem;
   color: #2196F3; /* Blue color for icon */
 }
 
@@ -55,6 +72,12 @@ i {
   margin-bottom: 1rem;
 }
 
+h1 {
+  font-size: 2rem; /* Adjusted font size for h1 */
+  font-weight: 600; /* Font weight for emphasis */
+  color: #333; /* Dark gray color */
+}
+
 h3 {
   font-size: 1.5rem;
   font-weight: 600;
@@ -65,19 +88,28 @@ h3 {
 p {
   font-size: 1rem;
   color: #666; /* Gray text color */
-  line-height: 1.6;
+  line-height: 1.6; /* Line height for readability */
+}
+
+ul {
+  list-style-type: disc; /* Bulleted list style */
+  padding-left: 1.5rem; /* Padding for list items */
+}
+
+ul li {
+  margin-bottom: 0.5rem; /* Spacing between list items */
 }
 
 @media (min-width: 1024px) {
   .item {
-    margin-top: 0;
-    padding: 1rem;
-    /* Adjust padding if needed */
+    width: 50rem; /* Fixed width for larger screens */
+    margin-top: 0; /* Remove top margin on larger screens */
+    padding: 2rem; /* Increased padding for better spacing */
   }
 
   .item:before,
   .item:after {
-    content: ' ';
+    content: '';
     border-left: 1px solid #ddd; /* Light gray border */
     position: absolute;
     left: 0;
@@ -101,11 +133,5 @@ p {
   .item:last-of-type:after {
     display: none;
   }
-}
-@media (min-width:1024px){
-  .item{
-    width: 50rem;
-  }
-  
 }
 </style>

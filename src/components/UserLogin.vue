@@ -48,7 +48,7 @@ const router = useRouter()
 const handleLogin = async () => {
   isLoading.value = true
   try {
-    const response = await axios.post('https://bluetutor-backend.vercel.app/login', {
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_SERVER_PRODUCTION}/login`, {
       username: username.value,
       password: password.value
     })
@@ -78,51 +78,56 @@ const handleLogin = async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 70vh;
+  height: 95vh; /* Full viewport height for better centering */
   background-color: #f5f5f5;
+  padding: 20px; /* Add padding for responsiveness */
 }
 
 .login-title {
   margin-bottom: 20px;
-  font-size: 2rem;
+  font-size: 2.5rem; /* Slightly larger title for prominence */
   color: #333;
+  font-weight: 600; /* Slightly bolder title */
 }
 
 .login-form {
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  width: 300px;
-  max-width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slightly larger shadow for depth */
+  padding: 30px; /* Increased padding for a spacious look */
+  width: 100%;
+  max-width: 400px; /* Adjust max-width for better scaling on larger screens */
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px; /* Increased margin for better spacing */
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 8px; /* Increased margin for better readability */
+  font-weight: 500; /* Medium weight for labels */
+  color: #555; /* Slightly lighter color for labels */
 }
 
 .form-group input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 12px; /* Increased padding for better touch targets */
+  border: 1px solid #ccc; /* Light border color for a subtle look */
   border-radius: 4px;
+  font-size: 1rem; /* Consistent font size */
 }
 
 .login-button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
 .login-button:hover {
@@ -130,13 +135,15 @@ const handleLogin = async () => {
 }
 
 .error-message {
-  margin-top: 10px;
+  margin-top: 15px;
   color: #dc3545;
   font-size: 0.875rem;
 }
+
 .success-message {
-  margin-top: 10px;
-  color: green;
-  font-size: rem;
+  margin-top: 15px;
+  color: #28a745; /* Updated color for success */
+  font-size: 0.875rem; /* Consistent font size with error message */
 }
+
 </style>
