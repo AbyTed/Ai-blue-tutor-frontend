@@ -116,7 +116,7 @@ const onFileChange = async (event) => {
 
     reader.onload = async (e) => {
       const dataUrl = e.target.result
-      console.log(dataUrl)
+      
 
       // Display the image
       const originalImg = document.getElementById('uploaded-image')
@@ -131,7 +131,7 @@ const onFileChange = async (event) => {
         const extractedText = await performOCR(grayscaleDataUrl)
         text.value = extractedText
       } catch (error) {
-        console.error(error.message)
+        console.error("")
       }
     }
 
