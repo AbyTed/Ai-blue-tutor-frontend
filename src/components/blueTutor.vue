@@ -147,7 +147,7 @@ const sendAudioRequest = async (text_value) => {
   try {
     // Send the request to the backend
     const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_SERVER_LOCAL}/tutor/audio`,
+      `${import.meta.env.VITE_BACKEND_SERVER_PRODUCTION}/tutor/audio`,
       { text: text_value },
       {
         headers: { 'Content-Type': 'application/json' },
