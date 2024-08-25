@@ -35,6 +35,9 @@
     <div class="audio-player">
       <audio v-if="audioUrl" controls :src="audioUrl"></audio>
     </div>
+    <button @click="sendAudioRequest('hello')">
+
+    </button>
   </div>
 </template>
 
@@ -144,7 +147,7 @@ const sendAudioRequest = async (text_value) => {
   try {
     // Send the request to the backend
     const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_SERVER_PRODUCTION}/tutor/audio`,
+      `${import.meta.env.VITE_BACKEND_SERVER_LOCAL}/tutor/audio`,
       { text: text_value },
       {
         headers: { 'Content-Type': 'application/json' },
