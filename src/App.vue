@@ -20,7 +20,7 @@
 #app {
   display: flex;
   flex-direction: column;
-  height: 90vh;
+  
 }
 
 main {

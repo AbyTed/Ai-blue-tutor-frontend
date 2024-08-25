@@ -1,18 +1,24 @@
 
 <template>
   <div class="ocr-container">
-    <form @submit.prevent="handleSubmit">
-      <h2 class="title">Ai English Tutor</h2>
-      <p class="instructions">Upload a picture, and we'll help you on your assignment!</p>
+    <form @submit.prevent="handleSubmit" class="form-background">
+      <h2 class="title">AI English Tutor</h2>
+      <p class="instructions">Upload a picture, and we'll help you with your assignment!</p>
       <input required type="file" @change="onFileChange" accept="image/*" class="file-input" />
       <textarea
         v-model="studentQuestion"
         placeholder="Type your question here..."
         class="question-input"
       ></textarea>
-      <type type="button" @click="handleRecording" :disabled="isRecognizing">
-        {{ isRecognizing ? 'Stop Recording' : 'Start Recording' }}
-      </type>
+      <button type="button" @click="handleRecording" class="record-button">
+        {{ isRecognizing ? 'Stop' : 'Start' }}
+        <font-awesome-icon
+          v-if="isRecognizing"
+          :icon="['fas', 'microphone']"
+          :style="{ color: '#000' }"
+        />
+        <font-awesome-icon v-else :icon="['fas', 'microphone']" :style="{ color: '#f30125' }" />
+      </button>
       <div class="question-container">
         <input type="submit" class="submit-button" value="Submit" />
       </div>
@@ -23,23 +29,20 @@
       alt="your assignment displayed here"
       width="50%"
     />
-
     <div v-if="isLoading" class="loading-sign">
       <div class="spinner"></div>
       <p>Processing...</p>
     </div>
-
     <p class="help" :class="messageType" v-if="responseMessage">
       {{ responseMessage }}
     </p>
-    <div class="audio-player">
-      <audio v-if="audioUrl" controls :src="audioUrl"></audio>
+    <div v-if="audioUrl" class="audio-player">
+      <audio controls :src="audioUrl"></audio>
     </div>
-    <button @click="sendAudioRequest('hello')">
-
-    </button>
   </div>
 </template>
+
+
 
 <script setup >
 import { ref } from 'vue'
@@ -119,7 +122,6 @@ const onFileChange = async (event) => {
 
     reader.onload = async (e) => {
       const dataUrl = e.target.result
-      
 
       // Display the image
       const originalImg = document.getElementById('uploaded-image')
@@ -134,7 +136,7 @@ const onFileChange = async (event) => {
         const extractedText = await performOCR(grayscaleDataUrl)
         text.value = extractedText
       } catch (error) {
-        console.error("")
+        console.error('')
       }
     }
 
@@ -286,51 +288,163 @@ const handleSubmit = async (event) => {
 }
 </script>
 
+
 <style scoped>
-.audio-player {
-  text-align: center;
-  margin-top: 20px;
+.form-background {
+  background-color: var(--vt-c-indigo);
+  color: var(--vt-c-white);
+  padding: 0px 30px 30px 5px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 700px;
+  border: 2px solid #2196F3;
 }
 
-textarea {
-  width: 100%;
-  height: 100px;
+.record-button {
+  background: transparent;
+  border: 2px solid var(--vt-c-white);
+  transition: color 0.3s, transform 0.3s;
+  cursor: pointer;
+  padding: 15px 30px;
+  font-size: 18px;
+  border-radius: 5px;
+  color: var(--vt-c-white);
+}
+
+.record-button:hover {
+  color: var(--vt-c-black);
+  border-color: var(--vt-c-black);
+  transform: scale(1.05);
+}
+
+.record-button:active {
+  color: var(--vt-c-white);
+  border-color: var(--vt-c-white);
+  transform: scale(0.95);
+}
+
+.ocr-container {
+  text-align: center;
+  height: 95vh;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 2rem;
+  color: var(--vt-c-text-dark-1);
   margin-bottom: 10px;
 }
 
-button {
-  padding: 10px 20px;
-  background-color: #2196f3;
-  color: #fff;
-  border: none;
+.instructions {
+  font-size: 1.2rem;
+  color: var(--vt-c-text-dark-2);
+  margin-bottom: 20px;
+}
+
+.file-input,
+.question-input,
+.submit-button,
+.send-audio-button {
+  display: block;
+  margin: 10px auto;
+}
+
+.file-input {
+  padding: 10px;
+  border: 2px solid var(--vt-c-white);
   border-radius: 5px;
+  font-size: 1rem;
   cursor: pointer;
+  background: var(--vt-c-indigo);
+  color: var(--vt-c-white);
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.question-input {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  border: 2px solid #2196F3;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  resize: vertical;
+  background: var(--vt-c-black-soft);
+  color: var(--vt-c-white);
 }
 
-audio {
+.submit-button,
+.send-audio-button {
+  padding: 10px 20px;
+  border: 2px solid #2196F3;
+  border-radius: 5px;
+  background: var(--vt-c-black-soft);
+  color: var(--vt-c-white);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.submit-button:hover,
+.send-audio-button:hover {
+  background: var(--vt-c-black);
+  transform: scale(1.05);
+}
+
+.submit-button:active,
+.send-audio-button:active {
+  background: var(--vt-c-black-mute);
+  transform: scale(0.95);
+}
+
+.uploaded-image {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 30%;
+}
+
+.audio-player {
   margin-top: 20px;
 }
 
-.audio-source {
-  margin-top: 1rem; /* Spacing above the audio component */
-  text-align: center; /* Center the audio controls */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--vt-c-white);
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
-.question-container {
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-sign {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--vt-c-white);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  background: #f9f9f9;
-  max-width: 600px;
-  margin: auto;
+  justify-content: center;
+  z-index: 1000;
 }
+
 .help {
   font-size: 1rem;
   border-radius: 5px;
@@ -356,118 +470,4 @@ audio {
   background-color: #cce5ff;
   border: 1px solid #b8daff;
 }
-
-.title {
-  font-size: 2rem;
-  color: #4a90e2;
-  margin-bottom: 10px;
-}
-
-.question-input {
-  width: 100%;
-  height: 150px;
-  padding: 10px;
-  border: 2px solid #4a90e2;
-  border-radius: 5px;
-  font-size: 1rem;
-  margin-bottom: 20px;
-  resize: vertical;
-}
-/* Add your CSS styles here */
-.file-input,
-.question-input,
-.submit-button {
-  display: block;
-  margin: 10px auto;
-}
-.uploaded-image {
-  display: block;
-  margin: 10px auto;
-}
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top: 4px solid #3498db;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-.submit-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background: #4a90e2;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.submit-button:hover {
-  background: #357abd;
-}
-
-.response-message {
-  font-size: 1rem;
-  color: #d9534f;
-  margin-top: 20px;
-  text-align: center;
-}
-
-.instructions {
-  font-size: 1.2rem;
-  color: #555;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.file-input {
-  margin-bottom: 20px;
-  padding: 10px;
-  border: 2px solid #4a90e2;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  background: #eaf4fc;
-}
-
-.ocr-container {
-  text-align: center;
-  height: 95vh;
-  padding: 50px;
-  align-content: center;
-}
-
-.loading-sign {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000; /* Make sure it's on top */
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
 </style>
-

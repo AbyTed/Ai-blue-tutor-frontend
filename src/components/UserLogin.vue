@@ -94,9 +94,10 @@ const handleLogin = async () => {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slightly larger shadow for depth */
-  padding: 30px; /* Increased padding for a spacious look */
+  padding: 50px 45px 40px 20px; /* Increased padding for a spacious look */
   width: 100%;
-  max-width: 400px; /* Adjust max-width for better scaling on larger screens */
+  max-width: 700px;
+  max-height: 700px; /* Adjust max-width for better scaling on larger screens */
 }
 
 .form-group {
@@ -134,14 +135,9 @@ const handleLogin = async () => {
   background-color: #0056b3;
 }
 
-.error-message {
-  margin-top: 15px;
-  color: #dc3545;
-  font-size: 0.875rem;
-}
+
 
 .success-message {
-  margin-top: 15px;
   color: #28a745; /* Updated color for success */
   font-size: 0.875rem; /* Consistent font size with error message */
 }
